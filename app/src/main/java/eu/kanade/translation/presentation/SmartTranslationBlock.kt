@@ -85,21 +85,52 @@ fun SmartTranslationBlock(
 
             // Measure final layout
             val textPlaceable = subcompose(Unit) {
-                Text(
-                    text = block.translation,
-                    fontSize = fontSize.value,
-                    fontFamily = fontFamily,
-                    color = Color.Black,
-                    softWrap = true,
-                    overflow = TextOverflow.Visible,
-                    textAlign = TextAlign.Center,
-                    maxLines = Int.MAX_VALUE,
+                // Box che contiene il testo principale e i duplicati per simulare un bordo bianco
+                Box(
                     modifier = Modifier
                         .width(width)
                         .rotate(if (isVertical) 0f else block.angle)
                         .align(Alignment.Center),
-//                        .background(color = Color.Blue),
-                )
+                ) {
+                    val outlineOffsets = listOf(
+                        -1f to 0f,
+                        1f to 0f,
+                        0f to -1f,
+                        0f to 1f,
+                        -1f to -1f,
+                        -1f to 1f,
+                        1f to -1f,
+                        1f to 1f,
+                    )
+                    // Disegno prima gli otto testi bianchi (outline)
+                    outlineOffsets.forEach { (ox, oy) ->
+                        Text(
+                            text = block.translation,
+                            fontSize = fontSize.value,
+                            fontFamily = fontFamily,
+                            color = Color.White,
+                            softWrap = true,
+                            overflow = TextOverflow.Visible,
+                            textAlign = TextAlign.Center,
+                            maxLines = Int.MAX_VALUE,
+                            modifier = Modifier
+                                .offset(ox.pxToDp(), oy.pxToDp())
+                                .align(Alignment.Center),
+                        )
+                    }
+                    // Testo principale sopra
+                    Text(
+                        text = block.translation,
+                        fontSize = fontSize.value,
+                        fontFamily = fontFamily,
+                        color = Color.Black,
+                        softWrap = true,
+                        overflow = TextOverflow.Visible,
+                        textAlign = TextAlign.Center,
+                        maxLines = Int.MAX_VALUE,
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                }
             }[0].measure(constraints)
 
             layout(textPlaceable.width, textPlaceable.height) {
