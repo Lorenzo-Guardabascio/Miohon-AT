@@ -22,13 +22,22 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import androidx.core.graphics.ColorUtils
@@ -485,6 +494,36 @@ class ReaderActivity : BaseActivity() {
                     )
                 }
                 null -> {}
+            }
+        }
+
+        // Translation toggle FAB
+        binding.translationToggleFab.setComposeContent {
+            val state by viewModel.state.collectAsState()
+            val hasTranslations = state.viewerChapters?.currChapter?.pages?.any { it.translation != null } == true
+            val showTranslations by readerPreferences.showTranslations().collectAsState()
+
+            if (hasTranslations) {
+                androidx.compose.material3.FloatingActionButton(
+                    onClick = {
+                        readerPreferences.showTranslations().set(!showTranslations)
+                    },
+                    modifier = androidx.compose.ui.Modifier
+                        .size(40.dp)
+                        .offset(y = if (state.menuVisible) (-80).dp else 0.dp),
+                    containerColor = androidx.compose.ui.graphics.Color.Black,
+                ) {
+                    androidx.compose.material3.Icon(
+                        imageVector = if (showTranslations) {
+                            androidx.compose.material.icons.Icons.Default.Visibility
+                        } else {
+                            androidx.compose.material.icons.Icons.Default.VisibilityOff
+                        },
+                        contentDescription = if (showTranslations) "Hide translations" else "Show translations",
+                        tint = androidx.compose.ui.graphics.Color.White,
+                        modifier = androidx.compose.ui.Modifier.size(20.dp),
+                    )
+                }
             }
         }
 
