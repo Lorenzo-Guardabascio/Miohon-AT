@@ -33,6 +33,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -504,24 +510,40 @@ class ReaderActivity : BaseActivity() {
             val showTranslations by readerPreferences.showTranslations().collectAsState()
 
             if (hasTranslations) {
-                androidx.compose.material3.FloatingActionButton(
-                    onClick = {
-                        readerPreferences.showTranslations().set(!showTranslations)
-                    },
-                    modifier = androidx.compose.ui.Modifier
-                        .size(40.dp)
+                // 1) interactionSource + stato originale da ripristinare
+                val interactionSource = remember { MutableInteractionSource() }
+                var pressedOriginal: Boolean? by remember { mutableStateOf(null) }
+
+                // 2) Ascolta press/release/cancel
+                LaunchedEffect(interactionSource) {
+                    interactionSource.interactions.collect { interaction ->
+                        when (interaction) {
+                            is PressInteraction.Press -> {
+                                pressedOriginal = readerPreferences.showTranslations().get()
+                                readerPreferences.showTranslations().set(false)
+                            }
+                            is PressInteraction.Release,
+                            is PressInteraction.Cancel -> {
+                                pressedOriginal?.let { readerPreferences.showTranslations().set(it) }
+                                pressedOriginal = null
+                            }
+                        }
+                    }
+                }
+
+                FloatingActionButton(
+                    onClick = { /* nessuna azione al click */ },
+                    interactionSource = interactionSource,
+                    modifier = Modifier
+                        .size(40.dp) // valuta 56.dp per accessibilità
                         .offset(y = if (state.menuVisible) (-80).dp else 0.dp),
                     containerColor = androidx.compose.ui.graphics.Color.Black,
                 ) {
-                    androidx.compose.material3.Icon(
-                        imageVector = if (showTranslations) {
-                            androidx.compose.material.icons.Icons.Default.Visibility
-                        } else {
-                            androidx.compose.material.icons.Icons.Default.VisibilityOff
-                        },
-                        contentDescription = if (showTranslations) "Hide translations" else "Show translations",
+                    Icon(
+                        imageVector = if (showTranslations) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = "Tieni premuto per nascondere le traduzioni",
                         tint = androidx.compose.ui.graphics.Color.White,
-                        modifier = androidx.compose.ui.Modifier.size(20.dp),
+                        modifier = Modifier.size(20.dp),
                     )
                 }
             }
