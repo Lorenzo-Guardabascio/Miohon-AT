@@ -50,8 +50,8 @@ class TranslationProvider(
      * @param source the source to query.
      */
     fun findSourceDir(source: Source): UniFile? {
-        val sourceDir = translationDir?.findFile(getSourceDirName(source))
-        return sourceDir
+        val sourceDir=translationDir?.findFile(getSourceDirName(source))
+        return sourceDir;
     }
 
     /**
@@ -142,4 +142,5 @@ class TranslationProvider(
             "Chapter"
         }
     }
+
 }

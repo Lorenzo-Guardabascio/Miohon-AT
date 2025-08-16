@@ -18,11 +18,10 @@ data class Translation(
     val manga: Manga,
     val chapter: Chapter,
     val fromLang: TextRecognizerLanguage = TextRecognizerLanguage.CHINESE,
-    val toLang: TextTranslatorLanguage = TextTranslatorLanguage.ENGLISH,
+    val toLang: TextTranslatorLanguage = TextTranslatorLanguage.ENGLISH
 ) {
     @Transient
     private val _statusFlow = MutableStateFlow(State.NOT_TRANSLATED)
-
     @Transient
     val statusFlow = _statusFlow.asStateFlow()
     var status: State

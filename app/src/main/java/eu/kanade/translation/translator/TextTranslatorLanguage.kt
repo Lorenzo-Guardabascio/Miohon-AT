@@ -189,8 +189,7 @@ enum class TextTranslatorLanguage(val code: String, val label: String) {
     ZHUANG_CHUANG("za", "Zhuang; Chuang"),
     CHINESESIM("zh", "Chinese Simplified"),
     CHINESETRAD("zh", "Chinese Traditional"),
-    ZULU("zu", "Zulu"),
-    ;
+    ZULU("zu", "Zulu");
 
     companion object {
 
@@ -208,5 +207,6 @@ enum class TextTranslatorLanguage(val code: String, val label: String) {
             }
             return lang
         }
+
     }
 }
